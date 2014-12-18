@@ -1,8 +1,8 @@
 'use strict';
 
 
-var gui = require('./gui.js');
-var _3dviz = require('./3dviz.js');
+// var gui = require('./gui.js');
+// var _3dviz = require('./3dviz.js');
 var SunCalc = require('suncalc');
 var THREE = require('three');
 
@@ -63,13 +63,13 @@ module.exports = function(sunlight, ambientLight){
         sunlight.color.setHex(tmpLight.getHex());
         ambientLight.color.setHex(tmpShadow.getHex());
 
-        _3dviz.render();
+        // _3dviz.render();
     }
     
     
-    applyLightTargetAtHour(gui.guiControls.hour);
+    // applyLightTargetAtHour(gui.guiControls.hour);
 
-    gui.hourControler.onChange(applyLightTargetAtHour);
+    // gui.hourControler.onChange(applyLightTargetAtHour);
 
     vec = computeDirection(date);
 	return vec;
