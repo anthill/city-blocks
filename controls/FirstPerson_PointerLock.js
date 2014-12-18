@@ -6,7 +6,7 @@
 */
 
 var THREE = require('three');
-var _getFloorHeight = require('../distanceToFloor.js');
+var _getFloorHeight = require('../utils/ray/distanceToFloor.js');
 
 var cos = Math.cos,
     sin = Math.sin,
