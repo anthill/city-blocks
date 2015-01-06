@@ -59,6 +59,23 @@ module.exports = function(camera, scene, domElement, loadObjects){
         // TODO send a ray in mouse direction and move camera.position.x/y in this direction
     }
     
+    function onCameraViewChangeSky(){
+        var L = 2 * camera.position.z * Math.tan(Math.PI*camera.fov/(2*180));
+        var l = L * window.innerWidth / window.innerHeight;
+
+        var south = camera.position.y - L/2;
+        var north = camera.position.y + L/2;
+        var west = camera.position.x - l/2;
+        var east = camera.position.x + l/2;
+        
+        // ask for a little extra
+        west -= 200;
+        south -= 200;
+        east += 200;
+        north += 200;
+
+        loadObjects(scene, south, north, east, west);
+    }
     
     
     camera.near = 1;
@@ -76,11 +93,13 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     window.addEventListener( 'keydown', onKeyDown );
     window.addEventListener( 'wheel', onScroll );
-
+    camera.on('cameraviewchange', onCameraViewChangeSky);
+        
     return function desactivate(){
         // In Chrome listening to keypress doesn't work for whatever reason
         window.removeEventListener( 'keydown', onKeyDown );
         window.removeEventListener( 'wheel', onScroll );
+        camera.off('cameraviewchange', onCameraViewChangeSky);
     };
     
 };
