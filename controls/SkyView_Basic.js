@@ -60,8 +60,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
     }
     
     function onCameraViewChangeSky(){
-        console.log('onCameraViewChangeSky', camera.position.x, camera.position.y, camera.position.z);
-        
         var L = 2 * camera.position.z * Math.tan(Math.PI*camera.fov/(2*180));
         var l = L * window.innerWidth / window.innerHeight;
 
