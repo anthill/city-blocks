@@ -124,38 +124,37 @@ module.exports = function(camera, scene, domElement, loadObjects){
     }
 
 
-    return function(x, y){
-        camera.up = new THREE.Vector3(0, 0, 1);
-        camera.near = 1;
-        camera.far = 50;
+    camera.up = new THREE.Vector3(0, 0, 1);
+    camera.near = 1;
+    camera.far = 50;
 
-        var rayCasterPosition = camera.position;
-        rayCasterPosition.z = 10000;
-        var distanceToFloor = getFloorHeight(rayCasterPosition);
-        // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
+    var rayCasterPosition = camera.position;
+    rayCasterPosition.z = 10000;
+    var distanceToFloor = getFloorHeight(rayCasterPosition);
+    // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
 
-        // init camera
-        camera.position.x = x;
-        camera.position.y = y;
-        camera.position.z = distanceToFloor !== undefined ? camera.position.z + HEIGHT - distanceToFloor : HEIGHT;
+    // camera position should be provided beforehand
+    /*camera.position.x = x;
+    camera.position.y = y;*/
+    camera.position.z = distanceToFloor !== undefined ? camera.position.z + HEIGHT - distanceToFloor : HEIGHT;
+    
 
-        // Looking north
-        lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
-        camera.lookAt( lookAtPoint );
+    // Looking north
+    lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
+    camera.lookAt( lookAtPoint );
 
-        domElement.addEventListener('mousemove', mouseMoveListener);
-        domElement.addEventListener('mousedown', mouseDownListener);
-        domElement.addEventListener('mouseup', mouseUpListener);
-        camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
+    domElement.addEventListener('mousemove', mouseMoveListener);
+    domElement.addEventListener('mousedown', mouseDownListener);
+    domElement.addEventListener('mouseup', mouseUpListener);
+    camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
 
-        return function desactivate(){
-            domElement.removeEventListener('mousemove', mouseMoveListener);
-            domElement.removeEventListener('mousedown', mouseDownListener);
-            domElement.removeEventListener('mouseup', mouseUpListener);
-            camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
-            cancelAnimationFrame(moveAnimationFrame);
-            moveAnimationFrame = undefined;
-        };
-    }
+    return function desactivate(){
+        domElement.removeEventListener('mousemove', mouseMoveListener);
+        domElement.removeEventListener('mousedown', mouseDownListener);
+        domElement.removeEventListener('mouseup', mouseUpListener);
+        camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
+        cancelAnimationFrame(moveAnimationFrame);
+        moveAnimationFrame = undefined;
+    };
 
 };

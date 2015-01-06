@@ -9,7 +9,7 @@
 
 var THREE = require('three');
 
-module.exports = function(camera, domElement){
+module.exports = function(camera, scene, domElement, loadObjects){
     
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
     var userPanSpeed = 50.0;
@@ -62,28 +62,27 @@ module.exports = function(camera, domElement){
     }
     
     
-    return function(x, y, altitude){
-        camera.near = 1;
-        camera.far = 5000;
-        
-        camera.up = new THREE.Vector3(0, 1, 0);
-        
-        camera.position.x = x; // 24541.22;
-        camera.position.y = y; // 11167.65;
-        camera.position.z = altitude; // 3;
-
-        camera.lookAt( new THREE.Vector3( x, y, 0 ) );
-        // looking North (y=1)
-        
-        window.addEventListener( 'keydown', onKeyDown );
-        window.addEventListener( 'wheel', onScroll );
-
-        return function desactivate(){
-            // In Chrome listening to keypress doesn't work for whatever reason
-            window.removeEventListener( 'keydown', onKeyDown );
-            window.removeEventListener( 'wheel', onScroll );
-        };
-    }
     
+    camera.near = 1;
+    camera.far = 5000;
+
+    camera.up = new THREE.Vector3(0, 1, 0);
+
+    // position should be provided beforehand
+    /*camera.position.x = x; // 24541.22;
+    camera.position.y = y; // 11167.65;
+    camera.position.z = altitude; // 3;*/
+
+    camera.lookAt( new THREE.Vector3( x, y, 0 ) );
+    // looking North (y=1)
+
+    window.addEventListener( 'keydown', onKeyDown );
+    window.addEventListener( 'wheel', onScroll );
+
+    return function desactivate(){
+        // In Chrome listening to keypress doesn't work for whatever reason
+        window.removeEventListener( 'keydown', onKeyDown );
+        window.removeEventListener( 'wheel', onScroll );
+    };
     
 };
