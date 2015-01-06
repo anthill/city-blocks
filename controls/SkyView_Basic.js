@@ -3,8 +3,6 @@
 /*
     * Keys up/down/right/left: move camera
     * Scroll up/down: zoom in/out
-    
-    * Click: center view on building
 */
 
 var THREE = require('three');
@@ -73,7 +71,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
     camera.position.y = y; // 11167.65;
     camera.position.z = altitude; // 3;*/
 
-    camera.lookAt( new THREE.Vector3( x, y, 0 ) );
+    camera.lookAt( new THREE.Vector3( camera.position.x, camera.position.y, 0 ) );
     // looking North (y=1)
 
     window.addEventListener( 'keydown', onKeyDown );
