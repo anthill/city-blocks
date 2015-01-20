@@ -11,7 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "browserify": "^5.0.0",
-    "three": "^0.68.0"
+    "three": "^0.68.0",
+    "dat-gui": "^0.5.0"
   },
   "devDependencies": {
     "watchify": "^1.0.2"
