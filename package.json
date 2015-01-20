@@ -12,6 +12,7 @@
   "dependencies": {
     "browserify": "^5.0.0",
     "three": "^0.68.0",
+    "suncalc": "^1.5.2",
     "dat-gui": "^0.5.0"
   },
   "devDependencies": {
