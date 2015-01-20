@@ -12,6 +12,9 @@ module.exports = function(camera, scene, domElement, loadObjects){
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
     var userPanSpeed = 50.0;
 
+    var MIN_Z = 10;
+    var MAX_Z = 500;
+
     function pan ( direction ) {
         var camx = camera.position.x + direction.x*userPanSpeed;
         var camy = camera.position.y + direction.y*userPanSpeed;
@@ -55,7 +58,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
         var deltaY = e.deltaY/minDeltaY;
         
         e.preventDefault();
-        camera.position.z += deltaY*ZOOM_BY_DELTA;
+        var newZ = camera.position.z + deltaY*ZOOM_BY_DELTA;
+        camera.position.z = Math.min(Math.max(newZ, MIN_Z), MAX_Z);
         // TODO send a ray in mouse direction and move camera.position.x/y in this direction
     }
     
