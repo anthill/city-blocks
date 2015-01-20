@@ -10,7 +10,7 @@
 
 var THREE = require('three');
 
-module.exports = function(camera, domElement){
+module.exports = function(camera, scene, domElement, loadObjects){
     
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
     var userPanSpeed = 50.0;

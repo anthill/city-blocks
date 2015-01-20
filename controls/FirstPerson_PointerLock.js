@@ -26,7 +26,7 @@ var moveLeft = false;
 var moveRight = false;
 
 
-module.exports = function(camera, scene, domElement){
+module.exports = function(camera, scene, domElement, loadObjects){
 
     
     
