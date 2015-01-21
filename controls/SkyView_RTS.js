@@ -139,7 +139,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     // console.log("cameraZ: " + camera.position.z);
 
-    camera.lookAt( new THREE.Vector3( x, y, 0 ) );
+    camera.lookAt( new THREE.Vector3(camera.position.x, camera.position.y, 0) );
     // looking North (y=1)
     
     window.addEventListener( 'keydown', onKeyDown );
