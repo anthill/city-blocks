@@ -12,7 +12,6 @@ var THREE = require('three');
 
 module.exports = function(camera, scene, domElement, loadObjects){
     
-    console.log('camera position1: ', camera.position.y);
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
     var userPanSpeed = 50.0;
 
@@ -23,7 +22,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
     var beta;
     var moveAnimationFrame;
 
-    console.log('camera position2: ', camera.position.y);
 
     function pan ( direction ) {
         var camx = camera.position.x + direction.x*userPanSpeed;
@@ -113,7 +111,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
         }
     }
 
-    console.log('camera position3: ', camera.position.y);
     var ZOOM_BY_DELTA = 25;
     
     // hack to normalize deltaY values across browsers.
@@ -134,17 +131,11 @@ module.exports = function(camera, scene, domElement, loadObjects){
     
     camera.near = 1;
     camera.far = 5000;
-    console.log('camera position3: ', camera.position.y);
-    camera.up = new THREE.Vector3(0, 1, 0);
-    
-    // camera.position.x = x; // 24541.22;
-    // camera.position.y = y; // 11167.65;
-    // camera.position.z = altitude; // 3;
 
-    // console.log("cameraZ: " + camera.position.z);
-    console.log('camera position4: ', camera.position.y);
-    camera.lookAt( new THREE.Vector3(camera.position.x, camera.position.y, 0) );
-    console.log('camera position: ', camera.position);
+    camera.up = new THREE.Vector3(0, 1, 0);
+    console.log('camera position ok: ', camera.position);
+    // camera.lookAt( new THREE.Vector3(camera.position.x, camera.position.y, 0) );
+    console.log('camera position ok?: ', camera.position);
     console.log('lookAt position: ', camera.lookAtVector);
     // looking North (y=1)
     
