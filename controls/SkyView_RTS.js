@@ -133,9 +133,9 @@ module.exports = function(camera, scene, domElement, loadObjects){
     camera.far = 5000;
 
     camera.up = new THREE.Vector3(0, 1, 0);
-    console.log('camera position ok: ', camera.position);
-    // camera.lookAt( new THREE.Vector3(camera.position.x, camera.position.y, 0) );
-    console.log('camera position ok?: ', camera.position);
+    console.log('camera position ok: ', camera.position.y);
+    camera.lookAt( new THREE.Vector3(camera.position.x, camera.position.y, 0) );
+    console.log('camera position ok?: ', camera.position.y);
     console.log('lookAt position: ', camera.lookAtVector);
     // looking North (y=1)
     
