@@ -128,32 +128,31 @@ module.exports = function(camera, scene, domElement, loadObjects){
     }
     
     
-    return function(x, y, altitude){
-        camera.near = 1;
-        camera.far = 5000;
-        
-        camera.up = new THREE.Vector3(0, 1, 0);
-        
-        camera.position.x = x; // 24541.22;
-        camera.position.y = y; // 11167.65;
-        camera.position.z = altitude; // 3;
+    camera.near = 1;
+    camera.far = 5000;
+    
+    camera.up = new THREE.Vector3(0, 1, 0);
+    
+    // camera.position.x = x; // 24541.22;
+    // camera.position.y = y; // 11167.65;
+    // camera.position.z = altitude; // 3;
 
-        console.log("cameraZ: " + camera.position.z);
+    // console.log("cameraZ: " + camera.position.z);
 
-        camera.lookAt( new THREE.Vector3( x, y, 0 ) );
-        // looking North (y=1)
-        
-        window.addEventListener( 'keydown', onKeyDown );
-        window.addEventListener( 'wheel', onScroll );
-        window.addEventListener( 'mousemove', mouseMoveListener );
+    camera.lookAt( new THREE.Vector3( x, y, 0 ) );
+    // looking North (y=1)
+    
+    window.addEventListener( 'keydown', onKeyDown );
+    window.addEventListener( 'wheel', onScroll );
+    window.addEventListener( 'mousemove', mouseMoveListener );
 
-        return function desactivate(){
-            // In Chrome listening to keypress doesn't work for whatever reason
-            window.removeEventListener( 'keydown', onKeyDown );
-            window.removeEventListener( 'wheel', onScroll );
-            window.removeEventListener( 'mousemove', mouseMoveListener );
-            cancelAnimationFrame(moveAnimationFrame);
-            moveAnimationFrame = undefined;
-        };
-    }    
+    return function desactivate(){
+        // In Chrome listening to keypress doesn't work for whatever reason
+        window.removeEventListener( 'keydown', onKeyDown );
+        window.removeEventListener( 'wheel', onScroll );
+        window.removeEventListener( 'mousemove', mouseMoveListener );
+        cancelAnimationFrame(moveAnimationFrame);
+        moveAnimationFrame = undefined;
+    };
+
 };

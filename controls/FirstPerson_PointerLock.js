@@ -193,57 +193,57 @@ module.exports = function(camera, scene, domElement, loadObjects){
         }
     };
     
-    return function(x, y){
-        var havePointerLock = 'pointerLockElement' in document ||
-        'mozPointerLockElement' in document ||
-        'webkitPointerLockElement' in document;
 
-        document.body.requestPointerLock = document.body.requestPointerLock ||
-            document.body.mozRequestPointerLock ||
-            document.body.webkitRequestPointerLock;
-        // Ask the browser to lock the pointer
-        document.body.requestPointerLock();
+    var havePointerLock = 'pointerLockElement' in document ||
+    'mozPointerLockElement' in document ||
+    'webkitPointerLockElement' in document;
 
-        
+    document.body.requestPointerLock = document.body.requestPointerLock ||
+        document.body.mozRequestPointerLock ||
+        document.body.webkitRequestPointerLock;
+    // Ask the browser to lock the pointer
+    document.body.requestPointerLock();
 
-        camera.up = new THREE.Vector3(0, 0, 1);
-        camera.near = 1;
-        camera.far = 50;
-        
-        var rayCasterPosition = camera.position;
-        rayCasterPosition.z = 10000;
-        var distanceToFloor = getFloorHeight(rayCasterPosition);
-        console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
-        
-        prevTime = performance.now();
+    
 
-        // init camera
-        camera.position.x = x;
-        camera.position.y = y;
-        camera.position.z = distanceToFloor !== undefined ? camera.position.z + HEIGHT - distanceToFloor : HEIGHT;
+    camera.up = new THREE.Vector3(0, 0, 1);
+    camera.near = 1;
+    camera.far = 50;
+    
+    var rayCasterPosition = camera.position;
+    rayCasterPosition.z = 10000;
+    var distanceToFloor = getFloorHeight(rayCasterPosition);
+    console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
+    
+    prevTime = performance.now();
 
-        // Looking north
-        lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
-        camera.lookAt( lookAtPoint );
+    // init camera
+    // camera.position.x = x;
+    // camera.position.y = y;
+    // camera.position.z = distanceToFloor !== undefined ? camera.position.z + HEIGHT - distanceToFloor : HEIGHT;
 
-        window.addEventListener('keydown', onKeyDown);
-        window.addEventListener('keyup', onKeyUp);
-        document.body.addEventListener("mousemove", headMovement, false);
+    // Looking north
+    lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
+    camera.lookAt( lookAtPoint );
 
-        return function desactivate(){
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    document.body.addEventListener("mousemove", headMovement, false);
 
-            document.exitPointerLock = document.exitPointerLock ||
-            document.mozExitPointerLock ||
-            document.webkitExitPointerLock;
-            document.exitPointerLock();
+    return function desactivate(){
 
-            window.removeEventListener('keydown', onKeyDown);
-            window.removeEventListener('keyup', onKeyUp);
+        document.exitPointerLock = document.exitPointerLock ||
+        document.mozExitPointerLock ||
+        document.webkitExitPointerLock;
+        document.exitPointerLock();
 
-            document.body.removeEventListener("mousemove", headMovement, false);
-            document.exitPointerLock();
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
 
-        };
-    }
+        document.body.removeEventListener("mousemove", headMovement, false);
+        document.exitPointerLock();
+
+    };
+    
     
 };
