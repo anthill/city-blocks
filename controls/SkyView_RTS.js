@@ -140,6 +140,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
     // console.log("cameraZ: " + camera.position.z);
 
     camera.lookAt( new THREE.Vector3(camera.position.x, camera.position.y, 0) );
+    console.log('camera position: ', camera.position);
+    console.log('lookAt position: ', camera.lookAtVector);
     // looking North (y=1)
     
     window.addEventListener( 'keydown', onKeyDown );
