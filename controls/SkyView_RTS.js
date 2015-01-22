@@ -129,7 +129,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
     // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeSky(){
         var L = 2 * camera.position.z * Math.tan(Math.PI*camera.fov/(2*180));
-        var l = L * domElement.innerWidth / domElement.innerHeight;
+        var l = L * domElement.clientWidth / domElement.clientHeight;
 
         var south = camera.position.y - L/2;
         var north = camera.position.y + L/2;
@@ -158,7 +158,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
         domElement.removeEventListener( 'keydown', onKeyDown );
         domElement.removeEventListener( 'wheel', onScroll );
         domElement.removeEventListener( 'mousemove', mouseMoveListener );
-        camera.on('cameraviewchange', onCameraViewChangeSky);
+        camera.off('cameraviewchange', onCameraViewChangeSky);
         cancelAnimationFrame(moveAnimationFrame);
         moveAnimationFrame = undefined;
     };

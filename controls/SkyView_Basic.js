@@ -76,7 +76,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
     // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeSky(){
         var L = 2 * camera.position.z * Math.tan(Math.PI*camera.fov/(2*180));
-        var l = L * window.innerWidth / window.innerHeight;
+        var l = L * domElement.clientWidth / domElement.clientHeight;
 
         var south = camera.position.y - L/2;
         var north = camera.position.y + L/2;
@@ -94,15 +94,15 @@ module.exports = function(camera, scene, domElement, loadObjects){
     
     
     // 4°) event listeners to allow camera viex changes
-    window.addEventListener( 'keydown', onKeyDown );
-    window.addEventListener( 'wheel', onScroll );
+    domElement.addEventListener( 'keydown', onKeyDown );
+    domElement.addEventListener( 'wheel', onScroll );
     camera.on('cameraviewchange', onCameraViewChangeSky);
         
     // 5°) IMPORTANT: don't forget to deactivate event listeners
     return function desactivate(){
         // In Chrome listening to keypress doesn't work for whatever reason
-        window.removeEventListener( 'keydown', onKeyDown );
-        window.removeEventListener( 'wheel', onScroll );
+        domElement.removeEventListener( 'keydown', onKeyDown );
+        domElement.removeEventListener( 'wheel', onScroll );
         camera.off('cameraviewchange', onCameraViewChangeSky);
     };
     
