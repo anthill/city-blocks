@@ -10,19 +10,30 @@
 
 var THREE = require('three');
 
+// General constants
+var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+var userPanSpeed = 50.0;
+
+var MIN_Z = 10;
+var MAX_Z = 500;
+
+var ZOOM_BY_DELTA = 25;
+
 module.exports = function(camera, scene, domElement, loadObjects){
     
-    var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
-    var userPanSpeed = 50.0;
-
-    var MIN_Z = 10;
-    var MAX_Z = 500;
-
     var alpha;
     var beta;
     var moveAnimationFrame;
 
+    // 1°) Camera initial settings
+    camera.near = 1;
+    camera.far = 5000;
 
+    camera.up = new THREE.Vector3(0, 1, 0);
+    camera.lookAt( new THREE.Vector3(camera.position.x, camera.position.y, 0) );
+    
+
+    // 2°) Functions to allow camera movement according to user input
     function pan ( direction ) {
         var camx = camera.position.x + direction.x*userPanSpeed;
         var camy = camera.position.y + direction.y*userPanSpeed;
@@ -82,37 +93,23 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
             if (Math.abs(deltaX) > thresX){
                 alpha = (Math.abs(deltaX)-thresX)*(Math.abs(deltaX)-thresX) / (normX*normX) * sign(deltaX) * camera.position.z/15;
-            //     alpha = MAX_HORI_SPEED *
-            //         (Math.abs(deltaX) - canvasBoundingRect.width/10)/
-            //         (canvasBoundingRect.width/2 - canvasBoundingRect.width/10);
-            //     if(deltaX > 0)
-            //         alpha = -alpha;
             }
             else {alpha = 0;}
 
             if (Math.abs(deltaZ) > thresZ){
                 beta = - (Math.abs(deltaZ)-thresZ)*(Math.abs(deltaZ)-thresZ) / (normZ*normZ) * sign(deltaZ) * camera.position.z/15;
-            //     beta = MAX_VERTI_SPEED *
-            //         (Math.abs(deltaZ) - canvasBoundingRect.height/20)/
-            //         (canvasBoundingRect.height/2 - canvasBoundingRect.height/20);
-            //     if(deltaZ > 0)
-            //         beta = -beta;
             }
             else {beta = 0;}
 
             if(!moveAnimationFrame)
                 moveAnimationFrame = requestAnimationFrame(moveCamera)
         }
-
-        // moveCamera();
         else{
             cancelAnimationFrame(moveAnimationFrame);
             moveAnimationFrame = undefined;
         }
     }
 
-    var ZOOM_BY_DELTA = 25;
-    
     // hack to normalize deltaY values across browsers.
     var minDeltaY;
     function onScroll(e){
@@ -128,26 +125,40 @@ module.exports = function(camera, scene, domElement, loadObjects){
         // TODO send a ray in mouse direction and move camera.position.x/y in this direction
     }
     
-    
-    camera.near = 1;
-    camera.far = 5000;
 
-    camera.up = new THREE.Vector3(0, 1, 0);
-    console.log('camera position ok: ', camera.position.y);
-    camera.lookAt( new THREE.Vector3(camera.position.x, camera.position.y, 0) );
-    console.log('camera position ok?: ', camera.position.y);
-    console.log('lookAt position: ', camera.lookAtVector);
-    // looking North (y=1)
-    
-    window.addEventListener( 'keydown', onKeyDown );
-    window.addEventListener( 'wheel', onScroll );
-    window.addEventListener( 'mousemove', mouseMoveListener );
+    // 3°) IMPORTANT: function to load buildings when camera view has changed
+    function onCameraViewChangeSky(){
+        var L = 2 * camera.position.z * Math.tan(Math.PI*camera.fov/(2*180));
+        var l = L * domElement.innerWidth / domElement.innerHeight;
 
+        var south = camera.position.y - L/2;
+        var north = camera.position.y + L/2;
+        var west = camera.position.x - l/2;
+        var east = camera.position.x + l/2;
+        
+        // ask for a little extra
+        west -= 200;
+        south -= 200;
+        east += 200;
+        north += 200;
+
+        loadObjects(scene, south, north, east, west);
+    }
+    
+    // 4°) event listeners to allow camera view changes
+    domElement.addEventListener( 'keydown', onKeyDown );
+    domElement.addEventListener( 'wheel', onScroll );
+    domElement.addEventListener( 'mousemove', mouseMoveListener );
+    camera.on('cameraviewchange', onCameraViewChangeSky);
+
+
+    // 5°) IMPORTANT: don't forget to deactivate event listeners
     return function desactivate(){
         // In Chrome listening to keypress doesn't work for whatever reason
-        window.removeEventListener( 'keydown', onKeyDown );
-        window.removeEventListener( 'wheel', onScroll );
-        window.removeEventListener( 'mousemove', mouseMoveListener );
+        domElement.removeEventListener( 'keydown', onKeyDown );
+        domElement.removeEventListener( 'wheel', onScroll );
+        domElement.removeEventListener( 'mousemove', mouseMoveListener );
+        camera.on('cameraviewchange', onCameraViewChangeSky);
         cancelAnimationFrame(moveAnimationFrame);
         moveAnimationFrame = undefined;
     };
