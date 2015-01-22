@@ -14,6 +14,8 @@ var THREE = require('three');
 var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 var userPanSpeed = 50.0;
 
+var SPEED = 1.5;
+
 var MIN_Z = 10;
 var MAX_Z = 500;
 
@@ -84,20 +86,20 @@ module.exports = function(camera, scene, domElement, loadObjects){
         var deltaX = e.clientX - canvasBoundingRect.width/2;
         var deltaZ = e.clientY - canvasBoundingRect.height/2;
 
-        var thresX = canvasBoundingRect.width*3/10;
-        var normX = canvasBoundingRect.width/2 - canvasBoundingRect.width*3/10;
-        var thresZ = canvasBoundingRect.height*3/10;
-        var normZ = canvasBoundingRect.height/2 - canvasBoundingRect.height*3/10;
+        var thresX = canvasBoundingRect.width*99/200;
+        var normX = canvasBoundingRect.width/2 - canvasBoundingRect.width*99/200;
+        var thresZ = canvasBoundingRect.height*99/200;
+        var normZ = canvasBoundingRect.height/2 - canvasBoundingRect.height*99/200;
 
         if(Math.abs(deltaX) > thresX || Math.abs(deltaZ) > thresZ){
 
             if (Math.abs(deltaX) > thresX){
-                alpha = (Math.abs(deltaX)-thresX)*(Math.abs(deltaX)-thresX) / (normX*normX) * sign(deltaX) * camera.position.z/15;
+                alpha = SPEED * sign(deltaX) * camera.position.z/15;
             }
             else {alpha = 0;}
 
             if (Math.abs(deltaZ) > thresZ){
-                beta = - (Math.abs(deltaZ)-thresZ)*(Math.abs(deltaZ)-thresZ) / (normZ*normZ) * sign(deltaZ) * camera.position.z/15;
+                beta = - SPEED * sign(deltaZ) * camera.position.z/15;
             }
             else {beta = 0;}
 

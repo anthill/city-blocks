@@ -43,7 +43,7 @@ module.exports = function(camera, scene, domElement){
 	        		'point': out[0].point 
 	        	}
 	        });
-	        window.dispatchEvent(newEvent);
+	        domElement.dispatchEvent(newEvent);
 
 	        // Color/uncolor the selected/unselected building
 	        /*if (old == out[0].object)
