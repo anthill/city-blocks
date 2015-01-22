@@ -43,7 +43,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
     var rayCasterPosition = camera.position;
     rayCasterPosition.z = 10000;
     var distanceToFloor = getFloorHeight(rayCasterPosition);
-    console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
+    // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
     
     prevTime = performance.now();
 
@@ -88,8 +88,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
         lookAtPoint.add(deltaPosition);
 
         // console.log("Position: x " + camera.position.x + " | y " + camera.position.y + " | z " + camera.position.z);
-        console.log("Direction: x " + camera.direction.x + " | y " + camera.direction.y + " | z " + camera.direction.z);
-        console.log("lookAt Z: " + camera.lookAtVector.z);
+        // console.log("Direction: x " + camera.direction.x + " | y " + camera.direction.y + " | z " + camera.direction.z);
+        // console.log("lookAt Z: " + camera.lookAtVector.z);
 
         prevTime = time;
         deltaPosition.x = 0;
@@ -229,8 +229,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
     }
 
     // 4°) event listeners to allow camera view changes
-    domElement.addEventListener('keydown', onKeyDown);
-    domElement.addEventListener('keyup', onKeyUp);
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
     document.body.addEventListener("mousemove", headMovement, false);
     camera.on('cameraviewchange', onCameraViewChangeSky);
 
@@ -242,8 +242,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
         document.webkitExitPointerLock;
         document.exitPointerLock();
 
-        domElement.removeEventListener('keydown', onKeyDown);
-        domElement.removeEventListener('keyup', onKeyUp);
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
         camera.off('cameraviewchange', onCameraViewChangeSky);
 
         document.body.removeEventListener("mousemove", headMovement, false);
