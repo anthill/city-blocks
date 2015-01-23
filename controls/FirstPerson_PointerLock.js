@@ -28,8 +28,6 @@ var moveRight = false;
 
 module.exports = function(camera, scene, domElement, loadObjects){
 
-    
-    
     var getFloorHeight = _getFloorHeight(scene);
     var lookAtPoint;
     var prevTime;
@@ -37,7 +35,34 @@ module.exports = function(camera, scene, domElement, loadObjects){
     var movementX, movementY;
     var previousDistanceToFloor;
 
+    // Pointerlock activation
+    var havePointerLock = 'pointerLockElement' in document ||
+    'mozPointerLockElement' in document ||
+    'webkitPointerLockElement' in document;
 
+    document.body.requestPointerLock = document.body.requestPointerLock ||
+        document.body.mozRequestPointerLock ||
+        document.body.webkitRequestPointerLock;
+    document.body.requestPointerLock();
+
+    // 1°) Camera initial settings
+    camera.up = new THREE.Vector3(0, 0, 1);
+    camera.near = 1;
+    camera.far = 50;
+    
+    var rayCasterPosition = camera.position;
+    rayCasterPosition.z = 10000;
+    var distanceToFloor = getFloorHeight(rayCasterPosition);
+    // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
+    
+    prevTime = performance.now();
+
+    // Looking north
+    lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
+    camera.lookAt( lookAtPoint );
+    updateCamera();
+    
+    // 2°) Functions to allow camera movement according to user input
     function updateCamera(){
 
         // delta is for smoothing movement according to framerate performances.
@@ -56,6 +81,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
                 var deltaHeight = distanceToFloor - previousDistanceToFloor;
                 lookAtPoint.z -= deltaHeight;
             }
+            else
+                lookAtPoint.z -= distanceToFloor;
         }
 
         deltaPosition.multiplyScalar(BODY_SPEED * delta);
@@ -64,8 +91,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
         lookAtPoint.add(deltaPosition);
 
         // console.log("Position: x " + camera.position.x + " | y " + camera.position.y + " | z " + camera.position.z);
-        console.log("Direction: x " + camera.direction.x + " | y " + camera.direction.y + " | z " + camera.direction.z);
-        console.log("lookAt Z: " + camera.lookAtVector.z);
+        // console.log("Direction: x " + camera.direction.x + " | y " + camera.direction.y + " | z " + camera.direction.z);
+        // console.log("lookAt Z: " + camera.lookAtVector.z);
 
         prevTime = time;
         deltaPosition.x = 0;
@@ -75,7 +102,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
         // See headMovement commentaries
         camera.lookAt(lookAtPoint);
     }
-
 
     function headMovement(event) {
 
@@ -192,58 +218,41 @@ module.exports = function(camera, scene, domElement, loadObjects){
                 break;
         }
     };
-    
-    return function(x, y){
-        var havePointerLock = 'pointerLockElement' in document ||
-        'mozPointerLockElement' in document ||
-        'webkitPointerLockElement' in document;
 
-        document.body.requestPointerLock = document.body.requestPointerLock ||
-            document.body.mozRequestPointerLock ||
-            document.body.webkitRequestPointerLock;
-        // Ask the browser to lock the pointer
-        document.body.requestPointerLock();
-
+    // 3°) IMPORTANT: function to load buildings when camera view has changed
+    function onCameraViewChangeFirstPerson(){
+        // console.log('onCameraViewChangeFirstPerson');
         
+        var south = camera.position.y - 300;
+        var north = camera.position.y + 300;
+        var west = camera.position.x - 300;
+        var east = camera.position.x + 300;
 
-        camera.up = new THREE.Vector3(0, 0, 1);
-        camera.near = 1;
-        camera.far = 50;
-        
-        var rayCasterPosition = camera.position;
-        rayCasterPosition.z = 10000;
-        var distanceToFloor = getFloorHeight(rayCasterPosition);
-        console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
-        
-        prevTime = performance.now();
-
-        // init camera
-        camera.position.x = x;
-        camera.position.y = y;
-        camera.position.z = distanceToFloor !== undefined ? camera.position.z + HEIGHT - distanceToFloor : HEIGHT;
-
-        // Looking north
-        lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
-        camera.lookAt( lookAtPoint );
-
-        window.addEventListener('keydown', onKeyDown);
-        window.addEventListener('keyup', onKeyUp);
-        document.body.addEventListener("mousemove", headMovement, false);
-
-        return function desactivate(){
-
-            document.exitPointerLock = document.exitPointerLock ||
-            document.mozExitPointerLock ||
-            document.webkitExitPointerLock;
-            document.exitPointerLock();
-
-            window.removeEventListener('keydown', onKeyDown);
-            window.removeEventListener('keyup', onKeyUp);
-
-            document.body.removeEventListener("mousemove", headMovement, false);
-            document.exitPointerLock();
-
-        };
+        loadObjects(scene, south, north, east, west);
     }
+
+    // 4°) event listeners to allow camera view changes
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    document.body.addEventListener("mousemove", headMovement, false);
+    camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
+
+    // 5°) IMPORTANT: don't forget to deactivate event listeners
+    return function desactivate(){
+
+        document.exitPointerLock = document.exitPointerLock ||
+        document.mozExitPointerLock ||
+        document.webkitExitPointerLock;
+        document.exitPointerLock();
+
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
+        camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
+
+        document.body.removeEventListener("mousemove", headMovement, false);
+        document.exitPointerLock();
+
+    };
+    
     
 };

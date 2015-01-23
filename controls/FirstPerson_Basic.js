@@ -13,7 +13,9 @@ var cos = Math.cos,
     sin = Math.sin,
     pow = Math.pow;
 
-var HEIGHT = 6;
+var HEIGHT = 1.8;
+
+var WALKING_SPEED = 0.05;
 
 var DISTANCE_TO_LOOK_AT = 20;
 var MAX_HORI_SPEED = Math.PI/100;
@@ -30,6 +32,24 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     var lookAtPoint;
 
+    // 1°) Camera initial settings
+    camera.up = new THREE.Vector3(0, 0, 1);
+    camera.near = 1;
+    camera.far = 50;
+
+    var rayCasterPosition = camera.position;
+    rayCasterPosition.z = 10000;
+    var distanceToFloor = getFloorHeight(rayCasterPosition);
+    // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
+
+    camera.position.z = distanceToFloor !== undefined ? camera.position.z + HEIGHT - distanceToFloor : HEIGHT;
+
+    // Looking north
+    lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
+    camera.lookAt( lookAtPoint );
+
+
+    // 2°) Functions to allow camera movement according to user input
     function moveCamera(){
         var newx = camera.position.x +
             ((lookAtPoint.x - camera.position.x)*cos(alpha) - (lookAtPoint.y - camera.position.y)*sin(alpha));
@@ -76,21 +96,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     }
 
-
     var moveAnimationFrame;
-    var SPEED = 0.05;
-
-    function onCameraViewChangeFirstPerson(){
-        console.log('onCameraViewChangeFirstPerson');
-        
-        var south = camera.position.y - 300;
-        var north = camera.position.y + 300;
-        var west = camera.position.x - 300;
-        var east = camera.position.x + 300;
-
-        loadObjects(scene, south, north, east, west);
-    }
-    
     
     function mouseDownListener(){
 
@@ -100,10 +106,10 @@ module.exports = function(camera, scene, domElement, loadObjects){
                 x : lookAtPoint.x - camera.position.x,
                 y : lookAtPoint.y - camera.position.y,
             };
-            camera.position.x += SPEED*moveVector.x;
-            lookAtPoint.x     += SPEED*moveVector.x;
-            camera.position.y += SPEED*moveVector.y;
-            lookAtPoint.y     += SPEED*moveVector.y;
+            camera.position.x += WALKING_SPEED*moveVector.x;
+            lookAtPoint.x     += WALKING_SPEED*moveVector.x;
+            camera.position.y += WALKING_SPEED*moveVector.y;
+            lookAtPoint.y     += WALKING_SPEED*moveVector.y;
 
             var rayCasterPosition = camera.position;
             rayCasterPosition.z = 10000;
@@ -114,8 +120,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
             moveAnimationFrame = requestAnimationFrame(moveForward);
         });
-
-
     }
 
     function mouseUpListener(){
@@ -123,31 +127,25 @@ module.exports = function(camera, scene, domElement, loadObjects){
         moveAnimationFrame = undefined;
     }
 
+    // 3°) IMPORTANT: function to load buildings when camera view has changed
+    function onCameraViewChangeFirstPerson(){
+        // console.log('onCameraViewChangeFirstPerson');
+        
+        var south = camera.position.y - 300;
+        var north = camera.position.y + 300;
+        var west = camera.position.x - 300;
+        var east = camera.position.x + 300;
 
-    camera.up = new THREE.Vector3(0, 0, 1);
-    camera.near = 1;
-    camera.far = 50;
+        loadObjects(scene, south, north, east, west);
+    }
 
-    var rayCasterPosition = camera.position;
-    rayCasterPosition.z = 10000;
-    var distanceToFloor = getFloorHeight(rayCasterPosition);
-    // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
-
-    // camera position should be provided beforehand
-    /*camera.position.x = x;
-    camera.position.y = y;*/
-    camera.position.z = distanceToFloor !== undefined ? camera.position.z + HEIGHT - distanceToFloor : HEIGHT;
-    
-
-    // Looking north
-    lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
-    camera.lookAt( lookAtPoint );
-
+    // 4°) event listeners to allow camera view changes
     domElement.addEventListener('mousemove', mouseMoveListener);
     domElement.addEventListener('mousedown', mouseDownListener);
     domElement.addEventListener('mouseup', mouseUpListener);
     camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
 
+    // 5°) IMPORTANT: don't forget to deactivate event listeners
     return function desactivate(){
         domElement.removeEventListener('mousemove', mouseMoveListener);
         domElement.removeEventListener('mousedown', mouseDownListener);

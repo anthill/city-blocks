@@ -30,7 +30,7 @@ function computeDirection(date){
 }
 
 
-module.exports = function(sunlight, ambientLight){
+module.exports = function(hour, sunlight, ambientLight){
     
     function applyLightTargetAtHour(hour){
         date.setHours(hour);
@@ -67,9 +67,7 @@ module.exports = function(sunlight, ambientLight){
     }
     
     
-    // applyLightTargetAtHour(gui.guiControls.hour);
-
-    // gui.hourControler.onChange(applyLightTargetAtHour);
+    applyLightTargetAtHour(hour);
 
     vec = computeDirection(date);
 	return vec;

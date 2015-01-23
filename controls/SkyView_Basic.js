@@ -7,14 +7,26 @@
 
 var THREE = require('three');
 
+// General constants
+var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+var userPanSpeed = 50.0;
+
+var MIN_Z = 10;
+var MAX_Z = 500;
+
+var ZOOM_BY_DELTA = 25;
+
 module.exports = function(camera, scene, domElement, loadObjects){
     
-    var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
-    var userPanSpeed = 50.0;
+    // 1°) Camera initial settings
+    camera.near = 1;
+    camera.far = 5000;
 
-    var MIN_Z = 10;
-    var MAX_Z = 500;
+    camera.up = new THREE.Vector3(0, 1, 0);
 
+    camera.lookAt( new THREE.Vector3( camera.position.x, camera.position.y, 0 ) );
+
+    // 2°) Functions to allow camera movement according to user input
     function pan ( direction ) {
         var camx = camera.position.x + direction.x*userPanSpeed;
         var camy = camera.position.y + direction.y*userPanSpeed;
@@ -25,7 +37,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
     };
 
     function onKeyDown( event ) {
-        console.log('keypress', event.keyCode);
+        // console.log('keypress', event.keyCode);
         switch ( event.keyCode ) {
             case keys.UP:
                 pan( new THREE.Vector3( 0, 1, 0 ) );
@@ -46,8 +58,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
         }
     }
     
-    var ZOOM_BY_DELTA = 25;
-    
     // hack to normalize deltaY values across browsers.
     var minDeltaY;
     function onScroll(e){
@@ -63,9 +73,10 @@ module.exports = function(camera, scene, domElement, loadObjects){
         // TODO send a ray in mouse direction and move camera.position.x/y in this direction
     }
     
+    // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeSky(){
         var L = 2 * camera.position.z * Math.tan(Math.PI*camera.fov/(2*180));
-        var l = L * window.innerWidth / window.innerHeight;
+        var l = L * domElement.clientWidth / domElement.clientHeight;
 
         var south = camera.position.y - L/2;
         var north = camera.position.y + L/2;
@@ -82,27 +93,16 @@ module.exports = function(camera, scene, domElement, loadObjects){
     }
     
     
-    camera.near = 1;
-    camera.far = 5000;
-
-    camera.up = new THREE.Vector3(0, 1, 0);
-
-    // position should be provided beforehand
-    /*camera.position.x = x; // 24541.22;
-    camera.position.y = y; // 11167.65;
-    camera.position.z = altitude; // 3;*/
-
-    camera.lookAt( new THREE.Vector3( camera.position.x, camera.position.y, 0 ) );
-    // looking North (y=1)
-
-    window.addEventListener( 'keydown', onKeyDown );
-    window.addEventListener( 'wheel', onScroll );
+    // 4°) event listeners to allow camera viex changes
+    domElement.addEventListener( 'keydown', onKeyDown );
+    domElement.addEventListener( 'wheel', onScroll );
     camera.on('cameraviewchange', onCameraViewChangeSky);
         
+    // 5°) IMPORTANT: don't forget to deactivate event listeners
     return function desactivate(){
         // In Chrome listening to keypress doesn't work for whatever reason
-        window.removeEventListener( 'keydown', onKeyDown );
-        window.removeEventListener( 'wheel', onScroll );
+        domElement.removeEventListener( 'keydown', onKeyDown );
+        domElement.removeEventListener( 'wheel', onScroll );
         camera.off('cameraviewchange', onCameraViewChangeSky);
     };
     
