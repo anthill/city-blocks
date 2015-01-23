@@ -55,10 +55,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
         var deltaX = e.clientX - canvasBoundingRect.width/2;
         var deltaZ = e.clientY - canvasBoundingRect.height/2;
 
-        var thresX = canvasBoundingRect.width*99/200;
-        var normX = canvasBoundingRect.width/2 - canvasBoundingRect.width*99/200;
-        var thresZ = canvasBoundingRect.height*99/200;
-        var normZ = canvasBoundingRect.height/2 - canvasBoundingRect.height*99/200;
+        var thresX = canvasBoundingRect.height/2 - 20;
+        var thresZ = canvasBoundingRect.height/2 - 20;
 
         if(Math.abs(deltaX) > thresX || Math.abs(deltaZ) > thresZ){
 
