@@ -235,7 +235,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     document.body.addEventListener("mousemove", headMovement, false);
-    camera.on('cameraviewchange', onCameraViewChangeSky);
+    camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
 
     // 5°) IMPORTANT: don't forget to deactivate event listeners
     return function desactivate(){
@@ -247,7 +247,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
         window.removeEventListener('keydown', onKeyDown);
         window.removeEventListener('keyup', onKeyUp);
-        camera.off('cameraviewchange', onCameraViewChangeSky);
+        camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
 
         document.body.removeEventListener("mousemove", headMovement, false);
         document.exitPointerLock();
