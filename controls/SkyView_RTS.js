@@ -36,37 +36,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
     
 
     // 2°) Functions to allow camera movement according to user input
-    function pan ( direction ) {
-        var camx = camera.position.x + direction.x*userPanSpeed;
-        var camy = camera.position.y + direction.y*userPanSpeed;
-        camera.position.x = camx;
-        camera.position.y = camy;
-
-        camera.lookAt( new THREE.Vector3( camx, camy, 0 ) );
-    };
-
-    function onKeyDown( event ) {
-        console.log('keypress', event.keyCode);
-        switch ( event.keyCode ) {
-            case keys.UP:
-                pan( new THREE.Vector3( 0, 1, 0 ) );
-                event.preventDefault();
-                break;
-            case keys.BOTTOM:
-                pan( new THREE.Vector3( 0, - 1, 0 ) );
-                event.preventDefault();
-                break;
-            case keys.LEFT:
-                pan( new THREE.Vector3( - 1, 0, 0 ) );
-                event.preventDefault();
-                break;
-            case keys.RIGHT:
-                pan( new THREE.Vector3( 1, 0, 0 ) );
-                event.preventDefault();
-                break;
-        }
-    }
-
     function sign(x) {
         return typeof x === 'number' ? x ? x < 0 ? -1 : 1 : x === x ? 0 : NaN : NaN;
     }
@@ -148,7 +117,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
     }
     
     // 4°) event listeners to allow camera view changes
-    domElement.addEventListener( 'keydown', onKeyDown );
     domElement.addEventListener( 'wheel', onScroll );
     domElement.addEventListener( 'mousemove', mouseMoveListener );
     camera.on('cameraviewchange', onCameraViewChangeSky);
@@ -157,7 +125,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
     // 5°) IMPORTANT: don't forget to deactivate event listeners
     return function desactivate(){
         // In Chrome listening to keypress doesn't work for whatever reason
-        domElement.removeEventListener( 'keydown', onKeyDown );
         domElement.removeEventListener( 'wheel', onScroll );
         domElement.removeEventListener( 'mousemove', mouseMoveListener );
         camera.off('cameraviewchange', onCameraViewChangeSky);

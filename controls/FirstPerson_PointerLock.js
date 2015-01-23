@@ -35,6 +35,16 @@ module.exports = function(camera, scene, domElement, loadObjects){
     var movementX, movementY;
     var previousDistanceToFloor;
 
+    // Pointerlock activation
+    var havePointerLock = 'pointerLockElement' in document ||
+    'mozPointerLockElement' in document ||
+    'webkitPointerLockElement' in document;
+
+    document.body.requestPointerLock = document.body.requestPointerLock ||
+        document.body.mozRequestPointerLock ||
+        document.body.webkitRequestPointerLock;
+    document.body.requestPointerLock();
+
     // 1°) Camera initial settings
     camera.up = new THREE.Vector3(0, 0, 1);
     camera.near = 1;
@@ -50,17 +60,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
     // Looking north
     lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
     camera.lookAt( lookAtPoint );
-
-    // Pointerlock activation
-    var havePointerLock = 'pointerLockElement' in document ||
-    'mozPointerLockElement' in document ||
-    'webkitPointerLockElement' in document;
-
-    document.body.requestPointerLock = document.body.requestPointerLock ||
-        document.body.mozRequestPointerLock ||
-        document.body.webkitRequestPointerLock;
-    document.body.requestPointerLock();
-
+    updateCamera();
+    
     // 2°) Functions to allow camera movement according to user input
     function updateCamera(){
 
@@ -80,6 +81,8 @@ module.exports = function(camera, scene, domElement, loadObjects){
                 var deltaHeight = distanceToFloor - previousDistanceToFloor;
                 lookAtPoint.z -= deltaHeight;
             }
+            else
+                lookAtPoint.z -= distanceToFloor;
         }
 
         deltaPosition.multiplyScalar(BODY_SPEED * delta);
