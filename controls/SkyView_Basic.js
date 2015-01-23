@@ -37,7 +37,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
     };
 
     function onKeyDown( event ) {
-        console.log('keypress', event.keyCode);
+        // console.log('keypress', event.keyCode);
         switch ( event.keyCode ) {
             case keys.UP:
                 pan( new THREE.Vector3( 0, 1, 0 ) );

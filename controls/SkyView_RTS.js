@@ -81,6 +81,15 @@ module.exports = function(camera, scene, domElement, loadObjects){
         }
     }
 
+    function mouseLeave(){
+        alpha = 0;
+        beta = 0;
+        // console.log("mouse leaves");
+
+        cancelAnimationFrame(moveAnimationFrame);
+        moveAnimationFrame = undefined;
+    }
+
     // hack to normalize deltaY values across browsers.
     var minDeltaY;
     function onScroll(e){
@@ -119,6 +128,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
     // 4°) event listeners to allow camera view changes
     domElement.addEventListener( 'wheel', onScroll );
     domElement.addEventListener( 'mousemove', mouseMoveListener );
+    domElement.addEventListener('mouseleave', mouseLeave);
     camera.on('cameraviewchange', onCameraViewChangeSky);
 
 
@@ -127,6 +137,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
         // In Chrome listening to keypress doesn't work for whatever reason
         domElement.removeEventListener( 'wheel', onScroll );
         domElement.removeEventListener( 'mousemove', mouseMoveListener );
+        domElement.removeEventListener('mouseleave', mouseLeave);
         camera.off('cameraviewchange', onCameraViewChangeSky);
         cancelAnimationFrame(moveAnimationFrame);
         moveAnimationFrame = undefined;

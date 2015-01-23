@@ -129,7 +129,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeFirstPerson(){
-        console.log('onCameraViewChangeFirstPerson');
+        // console.log('onCameraViewChangeFirstPerson');
         
         var south = camera.position.y - 300;
         var north = camera.position.y + 300;
