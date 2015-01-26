@@ -5,6 +5,7 @@ var THREE = require('three');
 module.exports = function(camera){
 
 	function fromMouse(event){
+		console.log('creating ray from mouse');
 		// event ca be a mousemove or click
 		var ray = new THREE.Raycaster(),
 		    projector = new THREE.Projector();
@@ -26,10 +27,12 @@ module.exports = function(camera){
 	}
 
 	function fromView(){
+		console.log('creating ray from view');
 		return new THREE.Raycaster( camera.position, camera.direction);
 	}
 
 	function fromPoint(point, direction){
+		console.log('creating ray from point and direction');
 		// point and direction are THREE.Vector3
 		return new THREE.Raycaster(point, direction);
 	}
