@@ -111,7 +111,9 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
         // Create pitch axis
         var axis = new THREE.Vector3();
-        axis.crossVectors(camera.direction, camera.up);
+        var camera2Ddirection = projectCameraDirection();
+        
+        axis.crossVectors(camera2Ddirection, camera.up);
 
         // Create quaternions for pitch and yaw, then combine them
         var yawQuat = new THREE.Quaternion(0,0,0,1);
@@ -144,8 +146,10 @@ module.exports = function(camera, scene, domElement, loadObjects){
         var t = new THREE.Vector3(0, 0, 0);
         var d = new THREE.Vector3(0, 0, 0);
 
-        t.crossVectors(camera.direction, camera.up);
-        d.copy(camera.direction);
+        var camera2Ddirection = projectCameraDirection();
+
+        t.crossVectors(camera2Ddirection, camera.up);
+        d.copy(camera2Ddirection);
         t.normalize();
         d.normalize();
 
@@ -155,6 +159,15 @@ module.exports = function(camera, scene, domElement, loadObjects){
         if (moveRight) deltaPosition.add(t);
 
         updateCamera();
+    }
+
+    function projectCameraDirection(){
+        var direction2D = new THREE.Vector3(0, 0, 0);
+
+        direction2D.x = camera.direction.x;
+        direction2D.y = camera.direction.y;
+
+        return direction2D;
     }
 
     var onKeyDown = function ( event ) {
