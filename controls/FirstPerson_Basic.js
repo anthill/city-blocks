@@ -131,12 +131,13 @@ module.exports = function(camera, scene, domElement, loadObjects){
     function onCameraViewChangeFirstPerson(){
         // console.log('onCameraViewChangeFirstPerson');
         
-        var south = camera.position.y - 300;
-        var north = camera.position.y + 300;
-        var west = camera.position.x - 300;
-        var east = camera.position.x + 300;
+        // var south = camera.position.y - 300;
+        // var north = camera.position.y + 300;
+        // var west = camera.position.x - 300;
+        // var east = camera.position.x + 300;
 
-        loadObjects(scene, south, north, east, west);
+        loadObjects.zone(scene, camera, domElement);
+        // loadObjects(scene, south, north, east, west);
     }
 
     // 4°) event listeners to allow camera view changes
