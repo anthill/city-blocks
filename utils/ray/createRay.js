@@ -4,25 +4,20 @@ var THREE = require('three');
 
 module.exports = function(camera){
 
-    function fromMouse(event){
+    function fromMouse(mousePositionInScreen){
         console.log('creating ray from mouse');
         // event ca be a mousemove or click
         var projector = new THREE.Projector();
 
-        var mouse = {
-            x: 0,
-            y: 0
-        };
-
         // Get the mouse X and Y screen positions, and scale them to [-1, 1] ranges, position (-1, 1) being the upper left side of the screen.
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        var x = (mousePositionInScreen.x / window.innerWidth) * 2 - 1;
+        var y = - (mousePositionInScreen.y / window.innerHeight) * 2 + 1;
         
         // Create Vector3 from mouse position, with Z = 0
-        var mousePos = new THREE.Vector3(mouse.x, mouse.y, 0);
+        var mousePosition3D = new THREE.Vector3(x, y, 0);
 
         // Create a picking-specific RayCaster from Three.js library 
-        return projector.pickingRay(mousePos, camera);
+        return projector.pickingRay(mousePosition3D, camera);
     }
 
     function fromView(){
@@ -42,3 +37,4 @@ module.exports = function(camera){
         fromPoint: fromPoint
     };
 }
+
