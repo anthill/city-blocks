@@ -3,6 +3,16 @@
 /*
     FPS Style
     body mouvement is handled by Z,Q,S,D keys
+
+    *** loadFunctions ***
+    This is a set of functions you can use to get buildings from the server into the 3D scene.
+    Use the getIDs function to require buildings IDs.
+    Use the loadObjects function to actually load the buildings.
+    Use the hideObjects function to hide buildings that are too far in the scene
+        .getIDsFromPoint(point, distance): imagine a square centered on point, with a side of 2*distance
+        .getIDsFromCamera(camera, extra): you get what's inside of the camera view, with a little extra
+        .loadObjects(IDs): require buildings IDs from server
+        .hideObjects(scene, camera, distance): hide buildings whose distance from camera position is too high
 */
 
 var THREE = require('three');
@@ -26,9 +36,18 @@ var moveLeft = false;
 var moveRight = false;
 
 
-module.exports = function(camera, scene, domElement, loadObjects){
+module.exports = function(camera, scene, domElement, loadFunctions){
 
+    // 0°) IMPORTANT: loadFunctions is a bundle of functions from city-core
+    var getIDsFromPoint = loadFunctions.getIDsFromPoint;
+    var getIDsFromCamera = loadFunctions.getIDsFromCamera;
+    var loadObjects = loadFunctions.loadObjects;
+    var hideObjects = loadFunctions.hideObjects;
+
+    // set up some utils from city-blocks
     var getFloorHeight = _getFloorHeight(scene);
+
+    // initialize your personal stuff
     var lookAtPoint;
     var prevTime;
     var deltaPosition = new THREE.Vector3(0,0,0);
@@ -230,7 +249,9 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeFirstPerson(){
-        loadObjects.zone(scene, camera, domElement);
+        var IDs = getIDsFromCamera(camera, 100);
+        loadObjects(scene, IDs);
+        hideObjects(scene, camera, 1000);
     }
 
     // 4°) event listeners to allow camera view changes

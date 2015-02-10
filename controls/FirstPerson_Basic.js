@@ -4,6 +4,16 @@
     * Move mouse: look around
     * Mouse down: move forward
     * Mouse up: stop moving forward
+
+    *** loadFunctions ***
+    This is a set of functions you can use to get buildings from the server into the 3D scene.
+    Use the getIDs function to require buildings IDs.
+    Use the loadObjects function to actually load the buildings.
+    Use the hideObjects function to hide buildings that are too far in the scene
+        .getIDsFromPoint(point, distance): imagine a square centered on point, with a side of 2*distance
+        .getIDsFromCamera(camera, extra): you get what's inside of the camera view, with a little extra
+        .loadObjects(IDs): require buildings IDs from server
+        .hideObjects(scene, camera, distance): hide buildings whose distance from camera position is too high
 */
 
 var THREE = require('three');
@@ -21,10 +31,18 @@ var DISTANCE_TO_LOOK_AT = 20;
 var MAX_HORI_SPEED = Math.PI/100;
 var MAX_VERTI_SPEED = Math.PI/120;
 
-module.exports = function(camera, scene, domElement, loadObjects){
+module.exports = function(camera, scene, domElement, loadFunctions){
 
+    // 0°) IMPORTANT: loadFunctions is a bundle of functions from city-core
+    var getIDsFromPoint = loadFunctions.getIDsFromPoint;
+    var getIDsFromCamera = loadFunctions.getIDsFromCamera;
+    var loadObjects = loadFunctions.loadObjects;
+    var hideObjects = loadFunctions.hideObjects;
+
+    // set up some utils from city-blocks
     var getFloorHeight = _getFloorHeight(scene);
 
+    // initialize your personal stuff
     var alpha;
     var beta;
     var animationFrame;
@@ -129,15 +147,9 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeFirstPerson(){
-        // console.log('onCameraViewChangeFirstPerson');
-        
-        // var south = camera.position.y - 300;
-        // var north = camera.position.y + 300;
-        // var west = camera.position.x - 300;
-        // var east = camera.position.x + 300;
-
-        loadObjects.zone(scene, camera, domElement);
-        // loadObjects(scene, south, north, east, west);
+        var IDs = getIDsFromCamera(camera, 100);
+        loadObjects(scene, IDs);
+        hideObjects(scene, camera, 1000);
     }
 
     // 4°) event listeners to allow camera view changes

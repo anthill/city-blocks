@@ -1,20 +1,34 @@
 'use strict';
 
 /*
-    * Keys up/down/right/left: move camera
-    * Mouse Move: move camera too
+    * Mouse Move: move camera
     * Scroll up/down: zoom in/out
     
     * Click: center view on building
+
+    * status in this Controls function
+    Here you can be "moving", "stopping", "stopped", "scrolling".
+    Each has a different policy regarding load buildings policy.
+        "moving": load only a small zone
+        "stopping": you've just stopped moving, then load a bigger zone
+        "stopped": you haven't moved in while, don't load anything
+        "scrolling": you zooming in/out, for now has the same behaviour than "stopping"
+
+    *** loadFunctions ***
+    This is a set of functions you can use to get buildings from the server into the 3D scene.
+    Use the getIDs function to require buildings IDs.
+    Use the loadObjects function to actually load the buildings.
+    Use the hideObjects function to hide buildings that are too far in the scene
+        .getIDsFromPoint(point, distance): imagine a square centered on point, with a side of 2*distance
+        .getIDsFromCamera(camera, extra): you get what's inside of the camera view, with a little extra
+        .loadObjects(IDs): require buildings IDs from server
+        .hideObjects(scene, camera, distance): hide buildings whose distance from camera position is too high
 */
 
 var THREE = require('three');
 var _createRay = require('../utils/ray/createRay.js');
 
 // General constants
-var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
-var userPanSpeed = 50.0;
-
 var SPEED = 1.5;
 var MOVING_ZONE_SIZE = 40;
 
@@ -23,15 +37,23 @@ var MAX_Z = 500;
 
 var ZOOM_BY_DELTA = 5;
 
-module.exports = function(camera, scene, domElement, loadObjects){
+module.exports = function(camera, scene, domElement, loadFunctions){
     
+    // 0°) IMPORTANT: loadFunctions is a bundle of functions from city-core
+    var getIDsFromPoint = loadFunctions.getIDsFromPoint;
+    var getIDsFromCamera = loadFunctions.getIDsFromCamera;
+    var loadObjects = loadFunctions.loadObjects;
+    var hideObjects = loadFunctions.hideObjects;
+
+    // set up some utils from city-blocks
+    var createRayFromMouse = _createRay(camera).fromMouse;
+
+    // initialize your personal stuff
     var alpha;
     var beta;
     var status = 'stopping';
     var moveAnimationFrame;
     var mousePos;
-
-    var createRayFromMouse = _createRay(camera).fromMouse;
 
     // 1°) Camera initial settings
     camera.near = 1;
@@ -111,7 +133,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
         e.preventDefault();
         var newZ = camera.position.z + deltaY*ZOOM_BY_DELTA;
         camera.position.z = Math.min(Math.max(newZ, MIN_Z), MAX_Z);
-        // TODO send a ray in mouse direction and move camera.position.x/y in this direction
     }
     
 
@@ -123,11 +144,15 @@ module.exports = function(camera, scene, domElement, loadObjects){
             var ray = createRayFromMouse(mousePos.x, mousePos.y);
             var point = ray.intersectObjects(scene.children, false)[0].point;
 
-            loadObjects.fast(scene, point, MOVING_ZONE_SIZE);
+            // Here we use loadFunctions methods to get the IDs of buildings we need, and then actually load them
+            var IDs = getIDsFromPoint(point, 40);
+            loadObjects(scene, IDs);
         }
 
         else if (status === 'stopping' || status === 'scrolling'){
-            loadObjects.zone(scene, camera, domElement);
+            var IDs = getIDsFromCamera(camera, 100);
+            loadObjects(scene, IDs);
+            hideObjects(scene, camera, 1000);
             status = 'stopped';
         }           
     }
