@@ -9,8 +9,9 @@
     Use the getIDs function to require buildings IDs.
     Use the loadObjects function to actually load the buildings.
     Use the hideObjects function to hide buildings that are too far in the scene
-        .getIDsFromPoint(point, distance): imagine a square centered on point, with a side of 2*distance
-        .getIDsFromCamera(camera, extra): you get what's inside of the camera view, with a little extra
+        .getObjectIdsAroundPoint(point, distance): imagine a square centered on point, with a side of 2*distance
+        .getObjectIdsFromCameraPosition(camera, extra): you get objects around camera position, with a little extra
+        .getObjectIdsAwayFromPoint(point, distance): you get objects further than distance from position
         .loadObjects(IDs): require buildings IDs from server
         .hideObjects(scene, camera, distance): hide buildings whose distance from camera position is too high
 */
@@ -29,7 +30,8 @@ var ZOOM_BY_DELTA = 25;
 module.exports = function(camera, scene, domElement, loadFunctions){
 
     // 0°) IMPORTANT: loadFunctions is a bundle of functions from city-core
-    var getIDsFromCamera = loadFunctions.getIDsFromCamera;
+    var getObjectIdsFromCameraPosition = loadFunctions.getObjectIdsFromCameraPosition;
+    var getObjectIdsAwayFromPoint = loadFunctions.getObjectIdsAwayFromPoint;
     var loadObjects = loadFunctions.loadObjects;
     var hideObjects = loadFunctions.hideObjects;
     
@@ -90,9 +92,11 @@ module.exports = function(camera, scene, domElement, loadFunctions){
     
     // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeSky(){
-        var IDs = getIDsFromCamera(camera, 100);
+        var IDs = getObjectIdsFromCameraPosition(camera, 100);
         loadObjects(scene, IDs);
-        hideObjects(scene, camera, 1000);
+
+        var ObjectToHideIds = getObjectIdsAwayFromPoint(camera.position, 1000);
+        hideObjects(scene, ObjectToHideIds);
     }
     
     
