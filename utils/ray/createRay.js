@@ -4,7 +4,7 @@ var THREE = require('three');
 
 module.exports = function(camera){
 
-    function fromMouse(event){
+    function fromMouse(x, y){
         console.log('creating ray from mouse');
         // event ca be a mousemove or click
         var projector = new THREE.Projector();
@@ -42,3 +42,4 @@ module.exports = function(camera){
         fromPoint: fromPoint
     };
 }
+
