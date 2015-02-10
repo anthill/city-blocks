@@ -15,8 +15,8 @@ module.exports = function(camera){
         };
 
         // Get the mouse X and Y screen positions, and scale them to [-1, 1] ranges, position (-1, 1) being the upper left side of the screen.
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        mouse.x = (x / window.innerWidth) * 2 - 1;
+        mouse.y = - (y / window.innerHeight) * 2 + 1;
         
         // Create Vector3 from mouse position, with Z = 0
         var mousePos = new THREE.Vector3(mouse.x, mouse.y, 0);
