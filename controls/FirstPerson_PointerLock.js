@@ -3,6 +3,17 @@
 /*
     FPS Style
     body mouvement is handled by Z,Q,S,D keys
+
+    *** loadFunctions ***
+    This is a set of functions you can use to get buildings from the server into the 3D scene.
+    Use the getIDs function to require buildings IDs.
+    Use the loadObjects function to actually load the buildings.
+    Use the hideObjects function to hide buildings that are too far in the scene
+        .getObjectIdsAroundPoint(point, distance): imagine a square centered on point, with a side of 2*distance
+        .getObjectIdsFromCameraPosition(camera, extra): you get objects around camera position, with a little extra
+        .getObjectIdsAwayFromPoint(point, distance): you get objects further than distance from position
+        .loadObjects(IDs): require buildings IDs from server
+        .hideObjects(scene, camera, distance): hide buildings whose distance from camera position is too high
 */
 
 var THREE = require('three');
@@ -18,7 +29,7 @@ var DISTANCE_TO_LOOK_AT = 20;
 
 var PITCH_SPEED = 0.005;
 var YAW_SPEED = 0.005;
-var BODY_SPEED = 4;
+var BODY_SPEED = 5;
 
 var moveForward = false;
 var moveBackward = false;
@@ -26,9 +37,19 @@ var moveLeft = false;
 var moveRight = false;
 
 
-module.exports = function(camera, scene, domElement, loadObjects){
+module.exports = function(camera, scene, domElement, loadFunctions){
 
+    // 0°) IMPORTANT: loadFunctions is a bundle of functions from city-core
+    var getObjectIdsAroundPoint = loadFunctions.getObjectIdsAroundPoint;
+    var getObjectIdsFromCameraPosition = loadFunctions.getObjectIdsFromCameraPosition;
+    var getObjectIdsAwayFromPoint = loadFunctions.getObjectIdsAwayFromPoint;
+    var loadObjects = loadFunctions.loadObjects;
+    var hideObjects = loadFunctions.hideObjects;
+
+    // set up some utils from city-blocks
     var getFloorHeight = _getFloorHeight(scene);
+
+    // initialize your personal stuff
     var lookAtPoint;
     var prevTime;
     var deltaPosition = new THREE.Vector3(0,0,0);
@@ -74,7 +95,6 @@ module.exports = function(camera, scene, domElement, loadObjects){
         var distanceToFloor = getFloorHeight(rayCasterPosition);
 
         // Position camera above the closest floor
-        // causes problems for lookAt behaviour when jumping on buildings roofs
         if(distanceToFloor !== undefined){
             camera.position.z += HEIGHT - distanceToFloor;
             if (previousDistanceToFloor !== undefined){
@@ -140,7 +160,7 @@ module.exports = function(camera, scene, domElement, loadObjects){
         updateCamera();
     }
 
-    function bodyMovement(dir){
+    function bodyMovement(){
         // t represents the direction to move towards to
         // t is normalized, so that deltaPosition has 'unitary' values
         var t = new THREE.Vector3(0, 0, 0);
@@ -175,27 +195,23 @@ module.exports = function(camera, scene, domElement, loadObjects){
         switch ( event.keyCode ) {
 
             case 38: // up
-            case 87: // w
+            case 90: // z
                 moveForward = true;
-                // bodyMovement('up');
                 break;
 
             case 37: // left
-            case 65: // a
+            case 81: // q
                 moveLeft = true;
-                // bodyMovement('left');
                 break;
 
             case 40: // down
             case 83: // s
                 moveBackward = true;
-                // bodyMovement('down');
                 break;
 
             case 39: // right
             case 68: // d
                 moveRight = true;
-                // bodyMovement('right');
                 break;
             // case 32: // space
             //     if ( canJump === true ) velocity.y += 350;
@@ -208,15 +224,16 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     var onKeyUp = function ( event ) {
 
+        console.log('keypress', event.keyCode);
         switch ( event.keyCode ) {
 
             case 38: // up
-            case 87: // w
+            case 90: // z
                 moveForward = false;
                 break;
 
             case 37: // left
-            case 65: // a
+            case 81: // q
                 moveLeft = false;
                 break;
 
@@ -234,14 +251,11 @@ module.exports = function(camera, scene, domElement, loadObjects){
 
     // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeFirstPerson(){
-        // console.log('onCameraViewChangeFirstPerson');
+        var IDs = getObjectIdsFromCameraPosition(camera, 100);
+        loadObjects(scene, IDs);
         
-        var south = camera.position.y - 300;
-        var north = camera.position.y + 300;
-        var west = camera.position.x - 300;
-        var east = camera.position.x + 300;
-
-        loadObjects(scene, south, north, east, west);
+        var ObjectToHideIds = getObjectIdsAwayFromPoint(camera.position, 1000);
+        hideObjects(scene, ObjectToHideIds);
     }
 
     // 4°) event listeners to allow camera view changes

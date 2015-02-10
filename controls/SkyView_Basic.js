@@ -3,6 +3,17 @@
 /*
     * Keys up/down/right/left: move camera
     * Scroll up/down: zoom in/out
+
+    *** loadFunctions ***
+    This is a set of functions you can use to get buildings from the server into the 3D scene.
+    Use the getIDs function to require buildings IDs.
+    Use the loadObjects function to actually load the buildings.
+    Use the hideObjects function to hide buildings that are too far in the scene
+        .getObjectIdsAroundPoint(point, distance): imagine a square centered on point, with a side of 2*distance
+        .getObjectIdsFromCameraPosition(camera, extra): you get objects around camera position, with a little extra
+        .getObjectIdsAwayFromPoint(point, distance): you get objects further than distance from position
+        .loadObjects(IDs): require buildings IDs from server
+        .hideObjects(scene, camera, distance): hide buildings whose distance from camera position is too high
 */
 
 var THREE = require('three');
@@ -16,7 +27,13 @@ var MAX_Z = 500;
 
 var ZOOM_BY_DELTA = 25;
 
-module.exports = function(camera, scene, domElement, loadObjects){
+module.exports = function(camera, scene, domElement, loadFunctions){
+
+    // 0°) IMPORTANT: loadFunctions is a bundle of functions from city-core
+    var getObjectIdsFromCameraPosition = loadFunctions.getObjectIdsFromCameraPosition;
+    var getObjectIdsAwayFromPoint = loadFunctions.getObjectIdsAwayFromPoint;
+    var loadObjects = loadFunctions.loadObjects;
+    var hideObjects = loadFunctions.hideObjects;
     
     // 1°) Camera initial settings
     camera.near = 1;
@@ -75,34 +92,24 @@ module.exports = function(camera, scene, domElement, loadObjects){
     
     // 3°) IMPORTANT: function to load buildings when camera view has changed
     function onCameraViewChangeSky(){
-        var L = 2 * camera.position.z * Math.tan(Math.PI*camera.fov/(2*180));
-        var l = L * domElement.clientWidth / domElement.clientHeight;
+        var IDs = getObjectIdsFromCameraPosition(camera, 100);
+        loadObjects(scene, IDs);
 
-        var south = camera.position.y - L/2;
-        var north = camera.position.y + L/2;
-        var west = camera.position.x - l/2;
-        var east = camera.position.x + l/2;
-        
-        // ask for a little extra
-        west -= 200;
-        south -= 200;
-        east += 200;
-        north += 200;
-
-        loadObjects(scene, south, north, east, west);
+        var ObjectToHideIds = getObjectIdsAwayFromPoint(camera.position, 1000);
+        hideObjects(scene, ObjectToHideIds);
     }
     
     
-    // 4°) event listeners to allow camera viex changes
-    domElement.addEventListener( 'keydown', onKeyDown );
-    domElement.addEventListener( 'wheel', onScroll );
+    // 4°) event listeners to allow camera view changes
+    window.addEventListener('keydown', onKeyDown);
+    domElement.addEventListener('wheel', onScroll);
     camera.on('cameraviewchange', onCameraViewChangeSky);
         
     // 5°) IMPORTANT: don't forget to deactivate event listeners
     return function desactivate(){
         // In Chrome listening to keypress doesn't work for whatever reason
-        domElement.removeEventListener( 'keydown', onKeyDown );
-        domElement.removeEventListener( 'wheel', onScroll );
+        window.removeEventListener('keydown', onKeyDown);
+        domElement.removeEventListener('wheel', onScroll);
         camera.off('cameraviewchange', onCameraViewChangeSky);
     };
     
